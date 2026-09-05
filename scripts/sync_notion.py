@@ -16,8 +16,8 @@ from collections import Counter, defaultdict
 import urllib.request
 import urllib.error
 
-NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
-DB_ID = os.environ.get("BACKTESTING_DB_ID", "207f7bb7-7d6d-80d7-b4f0-000bec43a2e3")
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN") or None
+DB_ID = os.environ.get("BACKTESTING_DB_ID") or "207f7bb7-7d6d-80d7-b4f0-000bec43a2e3"
 # This workspace uses Notion's multi-source database model, so the ID above is
 # a *data source* ID (not a classic database ID) and needs the newer
 # data_sources endpoint + API version rather than /v1/databases/{id}/query.
