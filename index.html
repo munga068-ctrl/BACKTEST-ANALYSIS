@@ -57,6 +57,7 @@
   .panel h2 { font-size: 14px; margin: 0 0 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
   .panel.full { grid-column: 1 / -1; }
   canvas { max-height: 280px; }
+  .chart-wrap { position: relative; height: 280px; width: 100%; }
 </style>
 </head>
 <body>
@@ -75,35 +76,35 @@
   <div class="grid">
     <div class="panel">
       <h2>Direction Bias</h2>
-      <canvas id="chart-direction"></canvas>
+      <div class="chart-wrap"><canvas id="chart-direction"></canvas></div>
     </div>
     <div class="panel">
       <h2>R:R Distribution</h2>
-      <canvas id="chart-rr"></canvas>
+      <div class="chart-wrap"><canvas id="chart-rr"></canvas></div>
     </div>
     <div class="panel">
       <h2>Entry Model Usage</h2>
-      <canvas id="chart-models"></canvas>
+      <div class="chart-wrap"><canvas id="chart-models"></canvas></div>
     </div>
     <div class="panel">
       <h2>Monthly Volume</h2>
-      <canvas id="chart-monthly"></canvas>
+      <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
     </div>
     <div class="panel">
       <h2>Duration Distribution</h2>
-      <canvas id="chart-duration"></canvas>
+      <div class="chart-wrap"><canvas id="chart-duration"></canvas></div>
     </div>
     <div class="panel">
       <h2>AM vs PM: Mean / Median Hold (min)</h2>
-      <canvas id="chart-session-duration"></canvas>
+      <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
     </div>
     <div class="panel full">
       <h2>Entry Time — AM / Lunch Session (9:30–12:15 ET)</h2>
-      <canvas id="chart-entry-am"></canvas>
+      <div class="chart-wrap"><canvas id="chart-entry-am"></canvas></div>
     </div>
     <div class="panel full">
       <h2>Entry Time — PM Session (1:30–4:00 PM ET)</h2>
-      <canvas id="chart-entry-pm"></canvas>
+      <div class="chart-wrap"><canvas id="chart-entry-pm"></canvas></div>
     </div>
   </div>
 </main>
@@ -199,7 +200,7 @@ async function loadData() {
       labels: Object.keys(dir),
       datasets: [{ data: Object.values(dir), backgroundColor: ['#dc2626','#16a34a','#9ca3af'] }]
     },
-    options: { plugins: { legend: { position: 'bottom' } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
   });
 
   const rrOrder = ["3R","3.5R","4R","4.5R","5R","5.5R","6R","6.5R","7R","8R+","10R +"];
@@ -207,7 +208,7 @@ async function loadData() {
   chartInstances.rr = new Chart(document.getElementById('chart-rr'), {
     type: 'bar',
     data: { labels: rrLabels, datasets: [{ label: 'Trades', data: rrLabels.map(k => data.rr_distribution[k]), backgroundColor: '#2563eb' }] },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
 
   chartInstances.models = new Chart(document.getElementById('chart-models'), {
@@ -216,7 +217,7 @@ async function loadData() {
       labels: Object.keys(data.entry_model_usage),
       datasets: [{ label: 'Times used', data: Object.values(data.entry_model_usage), backgroundColor: '#7c3aed' }]
     },
-    options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+    options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
   });
 
   chartInstances.monthly = new Chart(document.getElementById('chart-monthly'), {
@@ -225,14 +226,14 @@ async function loadData() {
       labels: bucketLabels(data.monthly_volume),
       datasets: [{ label: 'Ideas logged', data: bucketValues(data.monthly_volume), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3 }]
     },
-    options: { plugins: { legend: { display: false } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
 
   const db = durationBuckets(data.duration.raw);
   chartInstances.duration = new Chart(document.getElementById('chart-duration'), {
     type: 'bar',
     data: { labels: db.labels, datasets: [{ label: 'Trades', data: db.counts, backgroundColor: '#16a34a' }] },
-    options: { plugins: { legend: { display: false } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
 
   chartInstances.sessionDuration = new Chart(document.getElementById('chart-session-duration'), {
@@ -244,19 +245,19 @@ async function loadData() {
         { label: 'PM', data: [data.duration.pm_mean, data.duration.pm_median], backgroundColor: '#f59e0b' }
       ]
     },
-    options: { plugins: { legend: { position: 'bottom' } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
   });
 
   chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
     type: 'bar',
     data: { labels: bucketLabels(data.entry_time_buckets_am), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_am), backgroundColor: '#2563eb' }] },
-    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
   });
 
   chartInstances.entryPm = new Chart(document.getElementById('chart-entry-pm'), {
     type: 'bar',
     data: { labels: bucketLabels(data.entry_time_buckets_pm), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_pm), backgroundColor: '#d97706' }] },
-    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
   });
 }
 
