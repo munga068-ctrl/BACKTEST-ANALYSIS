@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backtest Analysis</title>
+<script>
+  // Prevent flash-of-wrong-theme
+  (function() {
+    const saved = localStorage.getItem('mmtrades-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #ffffff; --text: #1a1d23; --text-muted: #6b7280;
+    --border: #e5e7eb; --accent: #2563eb; --green: #16a34a; --red: #dc2626;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  [data-theme="dark"] {
+    --bg: #0f1115; --card: #171a21; --text: #e5e7eb; --text-muted: #9ca3af;
+    --border: #262a33; --accent: #3b82f6; --green: #22c55e; --red: #ef4444;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); transition: background .2s, color .2s;
+  }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--card);
+  }
+  header h1 { font-size: 18px; margin: 0; }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  #sync-status { font-size: 12px; color: var(--text-muted); }
+  #sync-status.stale { color: var(--red); }
+  button.icon-btn {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    width: 32px; height: 32px; cursor: pointer; font-size: 15px; color: var(--text);
+  }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; box-shadow: var(--shadow);
+  }
+  .stat-card .label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .stat-card .value { font-size: 22px; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; box-shadow: var(--shadow); margin-bottom: 16px;
+  }
+  .panel h2 { font-size: 14px; margin: 0 0 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .panel.full { grid-column: 1 / -1; }
+  canvas { max-height: 280px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Backtest Analysis</h1>
+  <div class="header-right">
+    <span id="sync-status">Loading…</span>
+    <button class="icon-btn" id="refresh-btn" title="Refresh">⟳</button>
+    <button class="icon-btn" id="theme-btn" title="Toggle theme">🌓</button>
+  </div>
+</header>
+
+<main>
+  <div class="stat-cards" id="stat-cards"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Direction Bias</h2>
+      <canvas id="chart-direction"></canvas>
+    </div>
+    <div class="panel">
+      <h2>R:R Distribution</h2>
+      <canvas id="chart-rr"></canvas>
+    </div>
+    <div class="panel">
+      <h2>Entry Model Usage</h2>
+      <canvas id="chart-models"></canvas>
+    </div>
+    <div class="panel">
+      <h2>Monthly Volume</h2>
+      <canvas id="chart-monthly"></canvas>
+    </div>
+    <div class="panel">
+      <h2>Duration Distribution</h2>
+      <canvas id="chart-duration"></canvas>
+    </div>
+    <div class="panel">
+      <h2>AM vs PM: Mean / Median Hold (min)</h2>
+      <canvas id="chart-session-duration"></canvas>
+    </div>
+    <div class="panel full">
+      <h2>Entry Time — AM / Lunch Session (9:30–12:15 ET)</h2>
+      <canvas id="chart-entry-am"></canvas>
+    </div>
+    <div class="panel full">
+      <h2>Entry Time — PM Session (1:30–4:00 PM ET)</h2>
+      <canvas id="chart-entry-pm"></canvas>
+    </div>
+  </div>
+</main>
+
+<script>
+const STALE_MINUTES = 20;
+let chartInstances = {};
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('mmtrades-theme', theme);
+}
+document.getElementById('theme-btn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+  loadData(); // redraw charts with new colors
+});
+
+function gridColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
+}
+function textColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+}
+
+function destroyCharts() {
+  Object.values(chartInstances).forEach(c => c && c.destroy());
+  chartInstances = {};
+}
+
+function statCard(label, value) {
+  return `<div class="stat-card"><div class="label">${label}</div><div class="value">${value}</div></div>`;
+}
+
+function bucketLabels(obj) {
+  return Object.keys(obj);
+}
+function bucketValues(obj) {
+  return Object.values(obj);
+}
+
+function durationBuckets(raw) {
+  const edges = [0,15,30,45,60,999999];
+  const labels = ["0-15","16-30","31-45","46-60","60+"];
+  const counts = [0,0,0,0,0];
+  raw.forEach(v => {
+    for (let i=0;i<edges.length-1;i++){
+      if (v > edges[i] && v <= edges[i+1]) { counts[i]++; break; }
+      if (i===0 && v <= 15) { counts[0]++; break; }
+    }
+  });
+  return {labels, counts};
+}
+
+async function loadData() {
+  destroyCharts();
+  let data;
+  try {
+    const res = await fetch('data/backtest.json?_=' + Date.now());
+    data = await res.json();
+  } catch (e) {
+    document.getElementById('sync-status').textContent = 'Failed to load data';
+    return;
+  }
+
+  // Sync status
+  const generated = new Date(data.generated_at);
+  const ageMin = Math.round((Date.now() - generated.getTime()) / 60000);
+  const statusEl = document.getElementById('sync-status');
+  statusEl.textContent = `Synced ${ageMin} min ago`;
+  statusEl.classList.toggle('stale', ageMin > STALE_MINUTES);
+
+  // Stat cards
+  const dir = data.direction;
+  const total = data.total_trades;
+  const shortPct = Math.round((dir.SHORT / total) * 100);
+  document.getElementById('stat-cards').innerHTML = [
+    statCard('Total Trades', total),
+    statCard('Short %', shortPct + '%'),
+    statCard('Median Hold', data.duration.median_minutes + ' min'),
+    statCard('Mean Hold', data.duration.mean_minutes + ' min'),
+    statCard('AM Trades', data.session_split.AM),
+    statCard('PM Trades', data.session_split.PM),
+  ].join('');
+
+  const grid = gridColor(), text = textColor();
+  Chart.defaults.color = text;
+  Chart.defaults.borderColor = grid;
+
+  chartInstances.direction = new Chart(document.getElementById('chart-direction'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(dir),
+      datasets: [{ data: Object.values(dir), backgroundColor: ['#dc2626','#16a34a','#9ca3af'] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  const rrOrder = ["3R","3.5R","4R","4.5R","5R","5.5R","6R","6.5R","7R","8R+","10R +"];
+  const rrLabels = rrOrder.filter(k => data.rr_distribution[k] !== undefined);
+  chartInstances.rr = new Chart(document.getElementById('chart-rr'), {
+    type: 'bar',
+    data: { labels: rrLabels, datasets: [{ label: 'Trades', data: rrLabels.map(k => data.rr_distribution[k]), backgroundColor: '#2563eb' }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  chartInstances.models = new Chart(document.getElementById('chart-models'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(data.entry_model_usage),
+      datasets: [{ label: 'Times used', data: Object.values(data.entry_model_usage), backgroundColor: '#7c3aed' }]
+    },
+    options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+  });
+
+  chartInstances.monthly = new Chart(document.getElementById('chart-monthly'), {
+    type: 'line',
+    data: {
+      labels: bucketLabels(data.monthly_volume),
+      datasets: [{ label: 'Ideas logged', data: bucketValues(data.monthly_volume), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3 }]
+    },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  const db = durationBuckets(data.duration.raw);
+  chartInstances.duration = new Chart(document.getElementById('chart-duration'), {
+    type: 'bar',
+    data: { labels: db.labels, datasets: [{ label: 'Trades', data: db.counts, backgroundColor: '#16a34a' }] },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  chartInstances.sessionDuration = new Chart(document.getElementById('chart-session-duration'), {
+    type: 'bar',
+    data: {
+      labels: ['Mean', 'Median'],
+      datasets: [
+        { label: 'AM', data: [data.duration.am_mean, data.duration.am_median], backgroundColor: '#2563eb' },
+        { label: 'PM', data: [data.duration.pm_mean, data.duration.pm_median], backgroundColor: '#f59e0b' }
+      ]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
+    type: 'bar',
+    data: { labels: bucketLabels(data.entry_time_buckets_am), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_am), backgroundColor: '#2563eb' }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
+  });
+
+  chartInstances.entryPm = new Chart(document.getElementById('chart-entry-pm'), {
+    type: 'bar',
+    data: { labels: bucketLabels(data.entry_time_buckets_pm), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_pm), backgroundColor: '#d97706' }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
+  });
+}
+
+document.getElementById('refresh-btn').addEventListener('click', loadData);
+loadData();
+setInterval(loadData, 5 * 60 * 1000); // client-side auto-refresh every 5 min
+</script>
+</body>
+</html>
