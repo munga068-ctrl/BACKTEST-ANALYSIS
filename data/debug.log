@@ -1,3 +1,0 @@
-Notion API error: 400
-URL: https://api.notion.com/v1/data_sources//query
-Body: {"object":"error","status":400,"code":"invalid_request_url","message":"Invalid request URL.","request_id":"6147f7aa-1ca9-4f6a-8500-15def6c3b269"}
