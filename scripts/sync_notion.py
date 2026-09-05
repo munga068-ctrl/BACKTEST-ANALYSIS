@@ -18,8 +18,11 @@ import urllib.error
 
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 DB_ID = os.environ.get("BACKTESTING_DB_ID", "207f7bb7-7d6d-80d7-b4f0-000bec43a2e3")
-NOTION_VERSION = "2022-06-28"
-API_URL = f"https://api.notion.com/v1/databases/{DB_ID}/query"
+# This workspace uses Notion's multi-source database model, so the ID above is
+# a *data source* ID (not a classic database ID) and needs the newer
+# data_sources endpoint + API version rather than /v1/databases/{id}/query.
+NOTION_VERSION = "2025-09-03"
+API_URL = f"https://api.notion.com/v1/data_sources/{DB_ID}/query"
 
 # US Eastern Time DST transition dates (2nd Sun in March / 1st Sun in Nov)
 # Extend this table as years roll forward.
