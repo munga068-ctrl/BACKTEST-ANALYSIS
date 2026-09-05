@@ -177,20 +177,36 @@ def build_stats(pages):
     }
 
 
+def write_debug(message):
+    os.makedirs("data", exist_ok=True)
+    with open("data/debug.log", "w") as f:
+        f.write(message + "\n")
+
+
 def main():
     if not NOTION_TOKEN:
+        write_debug("NOTION_TOKEN not set")
         print("NOTION_TOKEN not set", file=sys.stderr)
         sys.exit(1)
     try:
         pages = fetch_all_pages()
     except urllib.error.HTTPError as e:
-        print(f"Notion API error: {e.code} {e.read()}", file=sys.stderr)
+        body = e.read().decode(errors="replace")
+        write_debug(f"Notion API error: {e.code}\nURL: {API_URL}\nBody: {body}")
+        print(f"Notion API error: {e.code} {body}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        write_debug(f"Unexpected error: {type(e).__name__}: {e}")
+        print(f"Unexpected error: {e}", file=sys.stderr)
         sys.exit(1)
 
     stats = build_stats(pages)
     os.makedirs("data", exist_ok=True)
     with open("data/backtest.json", "w") as f:
         json.dump(stats, f, indent=2)
+    # Clear any stale debug log from a previous failed run
+    if os.path.exists("data/debug.log"):
+        os.remove("data/debug.log")
     print(f"Synced {stats['total_trades']} trades -> data/backtest.json")
 
 

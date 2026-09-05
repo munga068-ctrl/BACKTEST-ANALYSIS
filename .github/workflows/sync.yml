@@ -25,9 +25,10 @@ jobs:
         run: python scripts/sync_notion.py
 
       - name: Commit updated data
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/backtest.json
+          git add data/backtest.json data/debug.log 2>/dev/null || true
           git diff --staged --quiet || git commit -m "Sync backtest data [skip ci]"
           git push
