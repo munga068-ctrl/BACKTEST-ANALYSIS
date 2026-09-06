@@ -240,11 +240,25 @@ def main():
 
     stats = build_stats(pages)
     os.makedirs("data", exist_ok=True)
+
+    # TEMPORARY DIAGNOSTIC: dump raw property shape from the first page so we
+    # can see exactly what the live API returns vs. what get_prop() expects.
+    if pages:
+        sample_props = pages[0].get("properties", {})
+        debug_dump = {
+            "property_keys": list(sample_props.keys()),
+            "AM_FRAMEWORK_raw": sample_props.get("AM FRAMEWORK"),
+            "PM_FRAMEWORK_raw": sample_props.get("PM FRAMEWORK"),
+            "ENTRY_MODELS_raw": sample_props.get("ENTRY MODELS"),
+        }
+        with open("data/debug.log", "w") as f:
+            f.write(json.dumps(debug_dump, indent=2, default=str))
+    else:
+        if os.path.exists("data/debug.log"):
+            os.remove("data/debug.log")
+
     with open("data/backtest.json", "w") as f:
         json.dump(stats, f, indent=2)
-    # Clear any stale debug log from a previous failed run
-    if os.path.exists("data/debug.log"):
-        os.remove("data/debug.log")
     print(f"Synced {stats['total_trades']} trades -> data/backtest.json")
 
 
