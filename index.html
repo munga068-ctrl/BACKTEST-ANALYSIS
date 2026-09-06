@@ -11,7 +11,7 @@
     if (saved) document.documentElement.setAttribute('data-theme', saved);
   })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="vendor/chart.umd.js"></script>
 <style>
   :root {
     --bg: #f5f6f8; --card: #ffffff; --text: #1a1d23; --text-muted: #6b7280;
@@ -160,6 +160,14 @@ function durationBuckets(raw) {
 }
 
 async function loadData() {
+  if (typeof Chart === 'undefined') {
+    document.getElementById('sync-status').textContent = 'Chart.js failed to load';
+    document.getElementById('sync-status').classList.add('stale');
+    document.querySelectorAll('.chart-wrap').forEach(el => {
+      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--red);font-size:13px;">Chart.js failed to load — check browser console / ad blocker</div>';
+    });
+    return;
+  }
   destroyCharts();
   let data;
   try {
