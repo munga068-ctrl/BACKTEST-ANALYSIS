@@ -106,6 +106,20 @@ def bucket_5min(t: dt.datetime) -> str:
     return f"{t.hour:02d}:{minute:02d}"
 
 
+# Entry model relation IDs -> display names (from the ENTRY MODELS data source).
+# Hardcoded because resolving these dynamically would mean one extra Notion API
+# call per unique model; update this map if models are renamed or added.
+ENTRY_MODEL_NAMES = {
+    "269f7bb7-7d6d-8083-9a48-e3fae950184f": "2022 Model",
+    "269f7bb7-7d6d-8001-9a9e-de24422e97ae": "SB",
+    "269f7bb7-7d6d-8058-a69e-f3ad37c52e15": "OTE",
+    "269f7bb7-7d6d-8060-8554-fa7394e1bc3f": "BREAKER",
+    "269f7bb7-7d6d-8059-ab77-d9c05c6077b0": "IFVG in Breaker",
+    "288f7bb7-7d6d-804d-bce7-c2e8a2ed1889": "1st PFVG",
+    "28df7bb7-7d6d-8028-9dcc-c60bc4ae8d7c": "None",
+}
+
+
 def build_stats(pages):
     total = len(pages)
     direction = Counter()
@@ -114,11 +128,13 @@ def build_stats(pages):
     entry_models = Counter()
     am_count = 0
     pm_count = 0
-    entry_buckets = Counter()
+    entry_buckets_am = Counter()
+    entry_buckets_pm = Counter()
     durations = []
+    durations_am = []
+    durations_pm = []
 
     for p in pages:
-        name = get_prop(p, "Name", "title") or "Untitled"
         position = get_prop(p, "Position", "select")
         r_r = get_prop(p, "R R", "select")
         start_iso = get_prop(p, "Date", "date_start")
@@ -130,17 +146,24 @@ def build_stats(pages):
         direction[position or "Unset"] += 1
         if r_r:
             rr[r_r] += 1
-        if am_fw:
+        is_am = bool(am_fw)
+        is_pm = bool(pm_fw)
+        if is_am:
             am_count += 1
-        if pm_fw:
+        if is_pm:
             pm_count += 1
         for m in models:
-            entry_models[m.get("id", "unknown")] += 1
+            name = ENTRY_MODEL_NAMES.get(m.get("id", ""), m.get("id", "unknown"))
+            entry_models[name] += 1
 
         start_et = to_et(start_iso)
         if start_et:
             monthly[start_et.strftime("%Y-%m")] += 1
-            entry_buckets[bucket_5min(start_et)] += 1
+            bucket = bucket_5min(start_et)
+            if is_am:
+                entry_buckets_am[bucket] += 1
+            elif is_pm:
+                entry_buckets_pm[bucket] += 1
 
         if start_iso and end_iso:
             s = dt.datetime.fromisoformat(start_iso.replace("Z", "+00:00"))
@@ -148,15 +171,24 @@ def build_stats(pages):
             mins = round((e - s).total_seconds() / 60)
             if mins >= 0:
                 durations.append(mins)
+                if is_am:
+                    durations_am.append(mins)
+                elif is_pm:
+                    durations_pm.append(mins)
+
+    def mean_median(vals):
+        if not vals:
+            return None, None
+        vals = sorted(vals)
+        n = len(vals)
+        med = vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
+        return round(sum(vals) / n, 1), med
 
     durations.sort()
     n = len(durations)
-    median = (
-        durations[n // 2]
-        if n % 2
-        else (durations[n // 2 - 1] + durations[n // 2]) / 2
-    ) if n else None
-    mean = round(sum(durations) / n, 1) if n else None
+    mean, median = mean_median(durations)
+    am_mean, am_median = mean_median(durations_am)
+    pm_mean, pm_median = mean_median(durations_pm)
 
     return {
         "generated_at": dt.datetime.utcnow().isoformat() + "Z",
@@ -165,13 +197,19 @@ def build_stats(pages):
         "rr_distribution": dict(rr),
         "monthly_volume": dict(sorted(monthly.items())),
         "session_split": {"AM": am_count, "PM": pm_count},
-        "entry_time_buckets": dict(sorted(entry_buckets.items())),
+        "entry_model_usage": dict(entry_models.most_common()),
+        "entry_time_buckets_am": dict(sorted(entry_buckets_am.items())),
+        "entry_time_buckets_pm": dict(sorted(entry_buckets_pm.items())),
         "duration": {
             "count": n,
             "mean_minutes": mean,
             "median_minutes": median,
             "min_minutes": durations[0] if n else None,
             "max_minutes": durations[-1] if n else None,
+            "am_mean": am_mean,
+            "am_median": am_median,
+            "pm_mean": pm_mean,
+            "pm_median": pm_median,
             "raw": durations,
         },
     }
