@@ -240,30 +240,11 @@ def main():
 
     stats = build_stats(pages)
     os.makedirs("data", exist_ok=True)
-
-    # TEMPORARY DIAGNOSTIC: dump raw property shape from the first page so we
-    # can see exactly what the live API returns vs. what get_prop() expects.
-    if pages:
-        am_nonempty = sum(1 for p in pages if (p.get("properties", {}).get("AM FRAMEWORK") or {}).get("relation"))
-        pm_nonempty = sum(1 for p in pages if (p.get("properties", {}).get("PM FRAMEWORK") or {}).get("relation"))
-        models_nonempty = sum(1 for p in pages if (p.get("properties", {}).get("ENTRY MODELS") or {}).get("relation"))
-        debug_dump = {
-            "total_pages": len(pages),
-            "am_framework_nonempty_count": am_nonempty,
-            "pm_framework_nonempty_count": pm_nonempty,
-            "entry_models_nonempty_count": models_nonempty,
-            "sample_page_0_AM_FRAMEWORK": pages[0].get("properties", {}).get("AM FRAMEWORK"),
-            "sample_page_5_AM_FRAMEWORK": pages[5].get("properties", {}).get("AM FRAMEWORK") if len(pages) > 5 else None,
-            "sample_page_5_name": (pages[5].get("properties", {}).get("Name", {}).get("title") or [{}])[0].get("plain_text") if len(pages) > 5 else None,
-        }
-        with open("data/debug.log", "w") as f:
-            f.write(json.dumps(debug_dump, indent=2, default=str))
-    else:
-        if os.path.exists("data/debug.log"):
-            os.remove("data/debug.log")
-
     with open("data/backtest.json", "w") as f:
         json.dump(stats, f, indent=2)
+    # Clear any stale debug log from a previous failed run
+    if os.path.exists("data/debug.log"):
+        os.remove("data/debug.log")
     print(f"Synced {stats['total_trades']} trades -> data/backtest.json")
 
 
