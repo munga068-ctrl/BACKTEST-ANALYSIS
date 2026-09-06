@@ -38,13 +38,22 @@ def is_edt(d: dt.date) -> bool:
 
 
 def to_et(iso_str):
-    """Convert a Notion UTC ISO datetime string to US Eastern local time."""
+    """Convert a Notion ISO datetime string (which may be plain UTC with a
+    'Z' suffix, or may carry an explicit non-zero offset if Notion stored it
+    that way) to US Eastern local time, DST-aware."""
     if not iso_str:
         return None
     ts = iso_str.replace("Z", "+00:00")
     d = dt.datetime.fromisoformat(ts)
-    offset = 4 if is_edt(d.date()) else 5
-    return d - dt.timedelta(hours=offset)
+    # Normalize to a true UTC instant first regardless of whatever offset
+    # (zero or not) the source string carried, so we never double-convert
+    # a timestamp that Notion already stored with an explicit local offset.
+    if d.tzinfo is None:
+        d_utc = d.replace(tzinfo=dt.timezone.utc)
+    else:
+        d_utc = d.astimezone(dt.timezone.utc)
+    offset = 4 if is_edt(d_utc.date()) else 5
+    return (d_utc - dt.timedelta(hours=offset)).replace(tzinfo=None)
 
 
 def notion_request(payload, cursor=None):
@@ -237,27 +246,11 @@ def main():
 
     stats = build_stats(pages)
     os.makedirs("data", exist_ok=True)
-
-    # TEMPORARY DIAGNOSTIC: dump raw start_iso strings and their computed
-    # ET bucket for a handful of pages to find why buckets are shifted.
-    diag_rows = []
-    for p in pages[:8]:
-        name = (p.get("properties", {}).get("Name", {}).get("title") or [{}])[0].get("plain_text")
-        raw_date_prop = p.get("properties", {}).get("Date")
-        start_iso = get_prop(p, "Date", "date_start")
-        start_et = to_et(start_iso)
-        diag_rows.append({
-            "name": name,
-            "raw_date_property": raw_date_prop,
-            "start_iso_extracted": start_iso,
-            "computed_et": str(start_et),
-            "bucket": bucket_5min(start_et) if start_et else None,
-        })
-    with open("data/debug.log", "w") as f:
-        f.write(json.dumps(diag_rows, indent=2, default=str))
-
     with open("data/backtest.json", "w") as f:
         json.dump(stats, f, indent=2)
+    # Clear any stale debug log from a previous failed run
+    if os.path.exists("data/debug.log"):
+        os.remove("data/debug.log")
     print(f"Synced {stats['total_trades']} trades -> data/backtest.json")
 
 
