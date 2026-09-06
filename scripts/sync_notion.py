@@ -237,44 +237,11 @@ def main():
 
     stats = build_stats(pages)
     os.makedirs("data", exist_ok=True)
-
-    # TEMPORARY DIAGNOSTIC: directly query the AM Framework data source with
-    # this same token to see if it's reachable at all, independent of whether
-    # relations resolve on the Backtesting side.
-    diag = {}
-    try:
-        am_fw_url = "https://api.notion.com/v1/data_sources/269f7bb7-7d6d-81f1-b088-000b15b56be1/query"
-        req = urllib.request.Request(
-            am_fw_url, data=json.dumps({"page_size": 3}).encode(),
-            headers={"Authorization": f"Bearer {NOTION_TOKEN}", "Notion-Version": NOTION_VERSION, "Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req) as resp:
-            am_result = json.loads(resp.read())
-        diag["am_framework_direct_query"] = {
-            "result_count": len(am_result.get("results", [])),
-            "sample_names": [
-                (r.get("properties", {}).get("Name", {}).get("title") or [{}])[0].get("plain_text")
-                for r in am_result.get("results", [])
-            ],
-        }
-    except urllib.error.HTTPError as e:
-        diag["am_framework_direct_query"] = {"error": e.code, "body": e.read().decode(errors="replace")}
-
-    # Also grab one Backtesting page that we independently know (via MCP)
-    # should have a non-empty AM FRAMEWORK relation, by name.
-    known_page = next((p for p in pages if (p.get("properties", {}).get("Name", {}).get("title") or [{}])[0].get("plain_text") == "NQ 30/07"), None)
-    diag["known_page_NQ_30_07_AM_FRAMEWORK"] = known_page.get("properties", {}).get("AM FRAMEWORK") if known_page else "PAGE NOT FOUND"
-    diag["known_page_NQ_30_07_all_relation_keys"] = (
-        {k: v for k, v in known_page.get("properties", {}).items() if isinstance(v, dict) and v.get("type") == "relation"}
-        if known_page else None
-    )
-
-    with open("data/debug.log", "w") as f:
-        f.write(json.dumps(diag, indent=2, default=str))
-
     with open("data/backtest.json", "w") as f:
         json.dump(stats, f, indent=2)
+    # Clear any stale debug log from a previous failed run
+    if os.path.exists("data/debug.log"):
+        os.remove("data/debug.log")
     print(f"Synced {stats['total_trades']} trades -> data/backtest.json")
 
 
