@@ -1,0 +1,122 @@
+[
+  {
+    "name": "NQ 04/09",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-09-04T10:23:00.000-04:00",
+        "end": "2026-09-04T10:50:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-09-04T10:23:00.000-04:00",
+    "computed_et": "2026-09-04 06:23:00-04:00",
+    "bucket": "06:20"
+  },
+  {
+    "name": "NQ 02/09",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-09-02T10:46:00.000-04:00",
+        "end": "2026-09-02T10:58:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-09-02T10:46:00.000-04:00",
+    "computed_et": "2026-09-02 06:46:00-04:00",
+    "bucket": "06:45"
+  },
+  {
+    "name": "NQ 01/09",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-09-01T10:12:00.000-04:00",
+        "end": "2026-09-01T10:48:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-09-01T10:12:00.000-04:00",
+    "computed_et": "2026-09-01 06:12:00-04:00",
+    "bucket": "06:10"
+  },
+  {
+    "name": "NQ 01/09",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-09-01T14:10:00.000-04:00",
+        "end": "2026-09-01T14:32:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-09-01T14:10:00.000-04:00",
+    "computed_et": "2026-09-01 10:10:00-04:00",
+    "bucket": "10:10"
+  },
+  {
+    "name": "NQ 21/08",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-08-21T10:46:00.000-04:00",
+        "end": "2026-08-21T11:34:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-08-21T10:46:00.000-04:00",
+    "computed_et": "2026-08-21 06:46:00-04:00",
+    "bucket": "06:45"
+  },
+  {
+    "name": "NQ 07/08",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-08-07T10:59:00.000-04:00",
+        "end": "2026-08-07T11:30:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-08-07T10:59:00.000-04:00",
+    "computed_et": "2026-08-07 06:59:00-04:00",
+    "bucket": "06:55"
+  },
+  {
+    "name": "NQ 30/07",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-07-30T10:46:00.000-04:00",
+        "end": "2026-07-30T10:58:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-07-30T10:46:00.000-04:00",
+    "computed_et": "2026-07-30 06:46:00-04:00",
+    "bucket": "06:45"
+  },
+  {
+    "name": "NQ 29/07",
+    "raw_date_property": {
+      "id": "Opb%7B",
+      "type": "date",
+      "date": {
+        "start": "2026-07-30T14:36:00.000-04:00",
+        "end": "2026-07-30T14:47:00.000-04:00",
+        "time_zone": null
+      }
+    },
+    "start_iso_extracted": "2026-07-30T14:36:00.000-04:00",
+    "computed_et": "2026-07-30 10:36:00-04:00",
+    "bucket": "10:35"
+  }
+]
