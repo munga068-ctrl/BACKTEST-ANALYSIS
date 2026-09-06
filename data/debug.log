@@ -1,45 +1,19 @@
 {
-  "property_keys": [
-    "TRADE TAKEN",
-    "TRADE",
-    "Time period",
-    "PM SETUPS",
-    "AM SETUPS ",
-    "R R",
-    "Date",
-    "PM FRAMEWORK",
-    "\ud83d\udcb0 LIQUIDITY",
-    "BACKTESTING INDICES",
-    "\ud83c\udf3c NARRATIVE",
-    "ACCOUNTS",
-    "DOW",
-    "ADVANCED VIEW",
-    "ENTRY MODELS",
-    "Position",
-    "ENTRY PDA",
-    "DAILY BIAS",
-    "\ud83c\udfaf TARGET INEFFICIENCY",
-    "Duration",
-    " SESSION PROFILE",
-    "AM FRAMEWORK",
-    "Name"
-  ],
-  "AM_FRAMEWORK_raw": {
+  "total_pages": 140,
+  "am_framework_nonempty_count": 0,
+  "pm_framework_nonempty_count": 0,
+  "entry_models_nonempty_count": 0,
+  "sample_page_0_AM_FRAMEWORK": {
     "id": "xiXM",
     "type": "relation",
     "relation": [],
     "has_more": false
   },
-  "PM_FRAMEWORK_raw": {
-    "id": "Px_Q",
+  "sample_page_5_AM_FRAMEWORK": {
+    "id": "xiXM",
     "type": "relation",
     "relation": [],
     "has_more": false
   },
-  "ENTRY_MODELS_raw": {
-    "id": "nHMY",
-    "type": "relation",
-    "relation": [],
-    "has_more": false
-  }
+  "sample_page_5_name": "NQ 30/07"
 }
