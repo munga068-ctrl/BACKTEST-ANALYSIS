@@ -237,11 +237,27 @@ def main():
 
     stats = build_stats(pages)
     os.makedirs("data", exist_ok=True)
+
+    # TEMPORARY DIAGNOSTIC: dump raw start_iso strings and their computed
+    # ET bucket for a handful of pages to find why buckets are shifted.
+    diag_rows = []
+    for p in pages[:8]:
+        name = (p.get("properties", {}).get("Name", {}).get("title") or [{}])[0].get("plain_text")
+        raw_date_prop = p.get("properties", {}).get("Date")
+        start_iso = get_prop(p, "Date", "date_start")
+        start_et = to_et(start_iso)
+        diag_rows.append({
+            "name": name,
+            "raw_date_property": raw_date_prop,
+            "start_iso_extracted": start_iso,
+            "computed_et": str(start_et),
+            "bucket": bucket_5min(start_et) if start_et else None,
+        })
+    with open("data/debug.log", "w") as f:
+        f.write(json.dumps(diag_rows, indent=2, default=str))
+
     with open("data/backtest.json", "w") as f:
         json.dump(stats, f, indent=2)
-    # Clear any stale debug log from a previous failed run
-    if os.path.exists("data/debug.log"):
-        os.remove("data/debug.log")
     print(f"Synced {stats['total_trades']} trades -> data/backtest.json")
 
 
