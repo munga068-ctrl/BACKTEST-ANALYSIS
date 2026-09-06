@@ -257,15 +257,15 @@ async function loadData() {
   });
 
   chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
-    type: 'bar',
-    data: { labels: bucketLabels(data.entry_time_buckets_am), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_am), backgroundColor: '#2563eb' }] },
-    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
+    type: 'line',
+    data: { labels: bucketLabels(data.entry_time_buckets_am), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_am), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3, pointRadius: 2 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } }, y: { beginAtZero: true } } }
   });
 
   chartInstances.entryPm = new Chart(document.getElementById('chart-entry-pm'), {
-    type: 'bar',
-    data: { labels: bucketLabels(data.entry_time_buckets_pm), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_pm), backgroundColor: '#d97706' }] },
-    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } } } }
+    type: 'line',
+    data: { labels: bucketLabels(data.entry_time_buckets_pm), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_pm), borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.15)', fill: true, tension: 0.3, pointRadius: 2 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } }, y: { beginAtZero: true } } }
   });
 }
 
