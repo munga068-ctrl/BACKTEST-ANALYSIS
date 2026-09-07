@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Backtest Analysis</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
 <script>
   // Prevent flash-of-wrong-theme
   (function() {
@@ -58,6 +59,11 @@
   .panel.full { grid-column: 1 / -1; }
   canvas { max-height: 280px; }
   .chart-wrap { position: relative; height: 280px; width: 100%; }
+  .monthly-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .monthly-stats .cell { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+  .monthly-stats .cell .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .monthly-stats .cell .value { font-size: 15px; font-weight: 600; }
+  @media (max-width: 500px) { .monthly-stats { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -89,6 +95,7 @@
     <div class="panel">
       <h2>Monthly Volume</h2>
       <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
+      <div class="monthly-stats" id="monthly-stats"></div>
     </div>
     <div class="panel">
       <h2>Duration Distribution</h2>
@@ -236,6 +243,20 @@ async function loadData() {
     },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
+
+  const monthEntries = Object.entries(data.monthly_volume);
+  if (monthEntries.length) {
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const fmt = (ym) => { const [y, m] = ym.split('-'); return `${monthNames[parseInt(m,10)-1]} ${y}`; };
+    const busiest = monthEntries.reduce((a, b) => b[1] > a[1] ? b : a);
+    const quietest = monthEntries.reduce((a, b) => b[1] < a[1] ? b : a);
+    const avg = (monthEntries.reduce((s, [,v]) => s + v, 0) / monthEntries.length).toFixed(1);
+    document.getElementById('monthly-stats').innerHTML = `
+      <div class="cell"><div class="label">Busiest Month</div><div class="value">${fmt(busiest[0])} (${busiest[1]})</div></div>
+      <div class="cell"><div class="label">Quietest Month</div><div class="value">${fmt(quietest[0])} (${quietest[1]})</div></div>
+      <div class="cell"><div class="label">Monthly Average</div><div class="value">${avg}</div></div>
+    `;
+  }
 
   const db = durationBuckets(data.duration.raw);
   chartInstances.duration = new Chart(document.getElementById('chart-duration'), {
