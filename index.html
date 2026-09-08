@@ -57,6 +57,9 @@
   }
   .panel h2 { font-size: 14px; margin: 0 0 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
   .panel.full { grid-column: 1 / -1; }
+  .entry-row { display: flex; gap: 24px; }
+  .entry-col { flex: 1; min-width: 0; }
+  @media (max-width: 900px) { .entry-row { flex-direction: column; } }
   canvas { max-height: 280px; }
   .chart-wrap { position: relative; height: 280px; width: 100%; }
   .monthly-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
@@ -105,13 +108,15 @@
       <h2>AM vs PM: Mean / Median Hold (min)</h2>
       <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
     </div>
-    <div class="panel full">
-      <h2>Entry Time — AM / Lunch Session (9:30–12:15 ET)</h2>
-      <div class="chart-wrap"><canvas id="chart-entry-am"></canvas></div>
-    </div>
-    <div class="panel full">
-      <h2>Entry Time — PM Session (1:30–4:00 PM ET)</h2>
-      <div class="chart-wrap"><canvas id="chart-entry-pm"></canvas></div>
+    <div class="panel full entry-row">
+      <div class="entry-col">
+        <h2>Entry Time — AM / Lunch Session (9:30–12:15 ET)</h2>
+        <div class="chart-wrap"><canvas id="chart-entry-am"></canvas></div>
+      </div>
+      <div class="entry-col">
+        <h2>Entry Time — PM Session (1:30–4:00 PM ET)</h2>
+        <div class="chart-wrap"><canvas id="chart-entry-pm"></canvas></div>
+      </div>
     </div>
   </div>
 </main>
@@ -287,17 +292,87 @@ async function loadData() {
     options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
   });
 
-  chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
-    type: 'line',
-    data: { labels: bucketLabels(data.entry_time_buckets_am), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_am), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3, pointRadius: 2 }] },
-    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } }, y: { beginAtZero: true } } }
-  });
+function fillTimeRange(sparse, startMin, endMin) {
+  const labels = [];
+  const values = [];
+  for (let m = startMin; m <= endMin; m += 5) {
+    const h = Math.floor(m / 60), mm = m % 60;
+    const label = `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+    labels.push(label);
+    values.push(sparse[label] || 0);
+  }
+  return { labels, values };
+}
 
-  chartInstances.entryPm = new Chart(document.getElementById('chart-entry-pm'), {
-    type: 'line',
-    data: { labels: bucketLabels(data.entry_time_buckets_pm), datasets: [{ label: 'Trades', data: bucketValues(data.entry_time_buckets_pm), borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.15)', fill: true, tension: 0.3, pointRadius: 2 }] },
-    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } }, y: { beginAtZero: true } } }
-  });
+const verticalMarkerPlugin = {
+  id: 'verticalMarkers',
+  afterDraw(chart, args, opts) {
+    const markers = (opts && opts.markers) || [];
+    if (!markers.length) return;
+    const { ctx, chartArea, scales } = chart;
+    const xScale = scales.x;
+    markers.forEach(({ label, color }) => {
+      const idx = chart.data.labels.indexOf(label);
+      if (idx === -1) return;
+      const x = xScale.getPixelForValue(idx);
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = color;
+      ctx.moveTo(x, chartArea.top);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+};
+
+const amRange = fillTimeRange(data.entry_time_buckets_am, 9 * 60 + 30, 12 * 60 + 15);
+const pmRange = fillTimeRange(data.entry_time_buckets_pm, 13 * 60 + 30, 16 * 60);
+
+chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
+  type: 'line',
+  data: { labels: amRange.labels, datasets: [{ label: 'Trades', data: amRange.values, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 1 }] },
+  plugins: [verticalMarkerPlugin],
+  options: {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      verticalMarkers: { markers: [
+        { label: '10:00', color: 'rgba(100,116,139,0.6)' },
+        { label: '11:00', color: 'rgba(100,116,139,0.6)' },
+        { label: '11:30', color: '#d4a017' },
+        { label: '12:00', color: 'rgba(100,116,139,0.6)' },
+      ]}
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } },
+      y: { grid: { display: false }, beginAtZero: true }
+    }
+  }
+});
+
+chartInstances.entryPm = new Chart(document.getElementById('chart-entry-pm'), {
+  type: 'line',
+  data: { labels: pmRange.labels, datasets: [{ label: 'Trades', data: pmRange.values, borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.15)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 1 }] },
+  plugins: [verticalMarkerPlugin],
+  options: {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      verticalMarkers: { markers: [
+        { label: '14:00', color: 'rgba(100,116,139,0.6)' },
+        { label: '15:00', color: 'rgba(100,116,139,0.6)' },
+        { label: '15:30', color: 'rgba(100,116,139,0.6)' },
+      ]}
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxRotation: 90, minRotation: 90, autoSkip: true, maxTicksLimit: 20 } },
+      y: { grid: { display: false }, beginAtZero: true }
+    }
+  }
+});
 }
 
 document.getElementById('refresh-btn').addEventListener('click', loadData);
