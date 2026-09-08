@@ -235,13 +235,23 @@ async function loadData() {
     options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
   });
 
+  const monthLabelsRaw = bucketLabels(data.monthly_volume);
+  const monthLabelsShort = monthLabelsRaw.map(ym => { const [y, m] = ym.split('-'); return `${m}-${y.slice(2)}`; });
+
   chartInstances.monthly = new Chart(document.getElementById('chart-monthly'), {
     type: 'line',
     data: {
-      labels: bucketLabels(data.monthly_volume),
-      datasets: [{ label: 'Ideas logged', data: bucketValues(data.monthly_volume), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3 }]
+      labels: monthLabelsShort,
+      datasets: [{ label: 'Ideas logged', data: bucketValues(data.monthly_volume), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3, borderWidth: 1 }]
     },
-    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: true, color: 'rgba(148,163,184,0.35)', borderDash: [3, 3], drawTicks: false } },
+        y: { grid: { display: false } }
+      }
+    }
   });
 
   const monthEntries = Object.entries(data.monthly_volume);
