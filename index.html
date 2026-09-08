@@ -57,6 +57,10 @@
   }
   .panel h2 { font-size: 14px; margin: 0 0 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
   .panel.full { grid-column: 1 / -1; }
+  .full { grid-column: 1 / -1; }
+  .volume-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .volume-row .panel { margin-bottom: 0; }
+  @media (max-width: 1000px) { .volume-row { grid-template-columns: 1fr; } }
   .entry-row { display: flex; gap: 24px; }
   .entry-col { flex: 1; min-width: 0; }
   @media (max-width: 900px) { .entry-row { flex-direction: column; } }
@@ -95,18 +99,20 @@
       <h2>Entry Model Usage</h2>
       <div class="chart-wrap"><canvas id="chart-models"></canvas></div>
     </div>
-    <div class="panel">
-      <h2>Monthly Volume</h2>
-      <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
-      <div class="monthly-stats" id="monthly-stats"></div>
-    </div>
-    <div class="panel">
-      <h2>Duration Distribution</h2>
-      <div class="chart-wrap"><canvas id="chart-duration"></canvas></div>
-    </div>
-    <div class="panel">
-      <h2>AM vs PM: Mean / Median Hold (min)</h2>
-      <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
+    <div class="full volume-row">
+      <div class="panel volume-col-wide">
+        <h2>Monthly Volume</h2>
+        <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
+        <div class="monthly-stats" id="monthly-stats"></div>
+      </div>
+      <div class="panel volume-col">
+        <h2>Duration Distribution</h2>
+        <div class="chart-wrap"><canvas id="chart-duration"></canvas></div>
+      </div>
+      <div class="panel volume-col">
+        <h2>AM vs PM: Mean / Median Hold (min)</h2>
+        <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
+      </div>
     </div>
     <div class="panel full entry-row">
       <div class="entry-col">
