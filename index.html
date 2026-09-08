@@ -276,7 +276,7 @@ async function loadData() {
   const db = durationBuckets(data.duration.raw);
   chartInstances.duration = new Chart(document.getElementById('chart-duration'), {
     type: 'bar',
-    data: { labels: db.labels, datasets: [{ label: 'Trades', data: db.counts, backgroundColor: '#16a34a', barPercentage: 0.5, categoryPercentage: 0.5 }] },
+    data: { labels: db.labels, datasets: [{ label: 'Trades', data: db.counts, backgroundColor: '#16a34a', barPercentage: 0.5, categoryPercentage: 0.95 }] },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
 
@@ -285,8 +285,8 @@ async function loadData() {
     data: {
       labels: ['Mean', 'Median'],
       datasets: [
-        { label: 'AM', data: [data.duration.am_mean, data.duration.am_median], backgroundColor: '#2563eb', barPercentage: 0.5, categoryPercentage: 0.5 },
-        { label: 'PM', data: [data.duration.pm_mean, data.duration.pm_median], backgroundColor: '#f59e0b', barPercentage: 0.5, categoryPercentage: 0.5 }
+        { label: 'AM', data: [data.duration.am_mean, data.duration.am_median], backgroundColor: '#2563eb', barPercentage: 0.5, categoryPercentage: 0.95 },
+        { label: 'PM', data: [data.duration.pm_mean, data.duration.pm_median], backgroundColor: '#f59e0b', barPercentage: 0.5, categoryPercentage: 0.95 }
       ]
     },
     options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
