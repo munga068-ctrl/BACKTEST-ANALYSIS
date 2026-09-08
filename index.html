@@ -60,6 +60,10 @@
   .entry-row { display: flex; gap: 24px; }
   .entry-col { flex: 1; min-width: 0; }
   @media (max-width: 900px) { .entry-row { flex-direction: column; } }
+  .mini-row { display: flex; gap: 16px; }
+  .mini-col { flex: 1; min-width: 0; }
+  .mini-chart { height: 220px; }
+  @media (max-width: 600px) { .mini-row { flex-direction: column; } }
   canvas { max-height: 280px; }
   .chart-wrap { position: relative; height: 280px; width: 100%; }
   .monthly-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
@@ -95,18 +99,22 @@
       <h2>Entry Model Usage</h2>
       <div class="chart-wrap"><canvas id="chart-models"></canvas></div>
     </div>
-    <div class="panel">
+    <div class="panel full">
       <h2>Monthly Volume</h2>
       <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
       <div class="monthly-stats" id="monthly-stats"></div>
     </div>
     <div class="panel">
-      <h2>Duration Distribution</h2>
-      <div class="chart-wrap"><canvas id="chart-duration"></canvas></div>
-    </div>
-    <div class="panel">
-      <h2>AM vs PM: Mean / Median Hold (min)</h2>
-      <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
+      <div class="mini-row">
+        <div class="mini-col">
+          <h2>Duration Distribution</h2>
+          <div class="chart-wrap mini-chart"><canvas id="chart-duration"></canvas></div>
+        </div>
+        <div class="mini-col">
+          <h2>AM vs PM Hold (min)</h2>
+          <div class="chart-wrap mini-chart"><canvas id="chart-session-duration"></canvas></div>
+        </div>
+      </div>
     </div>
     <div class="panel full entry-row">
       <div class="entry-col">
@@ -333,12 +341,14 @@ const pmRange = fillTimeRange(data.entry_time_buckets_pm, 13 * 60 + 30, 16 * 60)
 
 chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
   type: 'line',
-  data: { labels: amRange.labels, datasets: [{ label: 'Trades', data: amRange.values, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 1 }] },
+  data: { labels: amRange.labels, datasets: [{ label: 'Trades', data: amRange.values, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 4, borderWidth: 1 }] },
   plugins: [verticalMarkerPlugin],
   options: {
     maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { display: false },
+      tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} trade${ctx.parsed.y === 1 ? '' : 's'}` } },
       verticalMarkers: { markers: [
         { label: '10:00', color: 'rgba(100,116,139,0.6)' },
         { label: '10:30', color: '#d4a017' },
@@ -355,12 +365,14 @@ chartInstances.entryAm = new Chart(document.getElementById('chart-entry-am'), {
 
 chartInstances.entryPm = new Chart(document.getElementById('chart-entry-pm'), {
   type: 'line',
-  data: { labels: pmRange.labels, datasets: [{ label: 'Trades', data: pmRange.values, borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.15)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 1 }] },
+  data: { labels: pmRange.labels, datasets: [{ label: 'Trades', data: pmRange.values, borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.15)', fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 4, borderWidth: 1 }] },
   plugins: [verticalMarkerPlugin],
   options: {
     maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { display: false },
+      tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} trade${ctx.parsed.y === 1 ? '' : 's'}` } },
       verticalMarkers: { markers: [
         { label: '14:00', color: 'rgba(100,116,139,0.6)' },
         { label: '15:00', color: 'rgba(100,116,139,0.6)' },
