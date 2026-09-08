@@ -60,10 +60,6 @@
   .entry-row { display: flex; gap: 24px; }
   .entry-col { flex: 1; min-width: 0; }
   @media (max-width: 900px) { .entry-row { flex-direction: column; } }
-  .mini-row { display: flex; gap: 16px; }
-  .mini-col { flex: 1; min-width: 0; }
-  .mini-chart { height: 220px; }
-  @media (max-width: 600px) { .mini-row { flex-direction: column; } }
   canvas { max-height: 280px; }
   .chart-wrap { position: relative; height: 280px; width: 100%; }
   .monthly-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
@@ -99,22 +95,18 @@
       <h2>Entry Model Usage</h2>
       <div class="chart-wrap"><canvas id="chart-models"></canvas></div>
     </div>
-    <div class="panel full">
+    <div class="panel">
       <h2>Monthly Volume</h2>
       <div class="chart-wrap"><canvas id="chart-monthly"></canvas></div>
       <div class="monthly-stats" id="monthly-stats"></div>
     </div>
     <div class="panel">
-      <div class="mini-row">
-        <div class="mini-col">
-          <h2>Duration Distribution</h2>
-          <div class="chart-wrap mini-chart"><canvas id="chart-duration"></canvas></div>
-        </div>
-        <div class="mini-col">
-          <h2>AM vs PM Hold (min)</h2>
-          <div class="chart-wrap mini-chart"><canvas id="chart-session-duration"></canvas></div>
-        </div>
-      </div>
+      <h2>Duration Distribution</h2>
+      <div class="chart-wrap"><canvas id="chart-duration"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>AM vs PM: Mean / Median Hold (min)</h2>
+      <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
     </div>
     <div class="panel full entry-row">
       <div class="entry-col">
@@ -284,7 +276,7 @@ async function loadData() {
   const db = durationBuckets(data.duration.raw);
   chartInstances.duration = new Chart(document.getElementById('chart-duration'), {
     type: 'bar',
-    data: { labels: db.labels, datasets: [{ label: 'Trades', data: db.counts, backgroundColor: '#16a34a' }] },
+    data: { labels: db.labels, datasets: [{ label: 'Trades', data: db.counts, backgroundColor: '#16a34a', barPercentage: 0.5, categoryPercentage: 0.5 }] },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
 
@@ -293,8 +285,8 @@ async function loadData() {
     data: {
       labels: ['Mean', 'Median'],
       datasets: [
-        { label: 'AM', data: [data.duration.am_mean, data.duration.am_median], backgroundColor: '#2563eb' },
-        { label: 'PM', data: [data.duration.pm_mean, data.duration.pm_median], backgroundColor: '#f59e0b' }
+        { label: 'AM', data: [data.duration.am_mean, data.duration.am_median], backgroundColor: '#2563eb', barPercentage: 0.5, categoryPercentage: 0.5 },
+        { label: 'PM', data: [data.duration.pm_mean, data.duration.pm_median], backgroundColor: '#f59e0b', barPercentage: 0.5, categoryPercentage: 0.5 }
       ]
     },
     options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
