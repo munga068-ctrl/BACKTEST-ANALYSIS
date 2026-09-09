@@ -61,9 +61,6 @@
   .volume-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .volume-row .panel { margin-bottom: 0; }
   @media (max-width: 1000px) { .volume-row { grid-template-columns: 1fr; } }
-  .entry-row { display: flex; gap: 24px; }
-  .entry-col { flex: 1; min-width: 0; }
-  @media (max-width: 900px) { .entry-row { flex-direction: column; } }
   canvas { max-height: 280px; }
   .chart-wrap { position: relative; height: 280px; width: 100%; }
   .monthly-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
@@ -114,15 +111,13 @@
         <div class="chart-wrap"><canvas id="chart-session-duration"></canvas></div>
       </div>
     </div>
-    <div class="panel full entry-row">
-      <div class="entry-col">
-        <h2>Entry Time — AM / Lunch Session (9:30–12:15 ET)</h2>
-        <div class="chart-wrap"><canvas id="chart-entry-am"></canvas></div>
-      </div>
-      <div class="entry-col">
-        <h2>Entry Time — PM Session (1:30–4:00 PM ET)</h2>
-        <div class="chart-wrap"><canvas id="chart-entry-pm"></canvas></div>
-      </div>
+    <div class="panel full">
+      <h2>Entry Time — AM / Lunch Session (9:30–12:15 ET)</h2>
+      <div class="chart-wrap"><canvas id="chart-entry-am"></canvas></div>
+    </div>
+    <div class="panel full">
+      <h2>Entry Time — PM Session (1:30–4:00 PM ET)</h2>
+      <div class="chart-wrap"><canvas id="chart-entry-pm"></canvas></div>
     </div>
   </div>
 </main>
