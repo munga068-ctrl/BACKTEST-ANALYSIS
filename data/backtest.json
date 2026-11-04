@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-04T21:50:17.916530Z",
+  "generated_at": "2026-11-04T21:55:15.626612Z",
   "total_trades": 151,
   "direction": {
     "Unset": 6,
@@ -37,7 +37,7 @@
     "2026-11": 2
   },
   "session_split": {
-    "AM": 92,
+    "AM": 93,
     "PM": 59
   },
   "entry_model_usage": {
@@ -77,7 +77,8 @@
     "11:45": 1,
     "12:00": 1,
     "12:10": 2,
-    "14:15": 1
+    "14:15": 1,
+    "17:00": 1
   },
   "entry_time_buckets_pm": {
     "13:40": 1,
@@ -105,16 +106,17 @@
     "15:45": 2
   },
   "duration": {
-    "count": 150,
-    "mean_minutes": 40.7,
-    "median_minutes": 31.0,
-    "min_minutes": 2,
+    "count": 151,
+    "mean_minutes": 40.4,
+    "median_minutes": 31,
+    "min_minutes": 0,
     "max_minutes": 186,
-    "am_mean": 43.3,
-    "am_median": 31.0,
+    "am_mean": 42.8,
+    "am_median": 31,
     "pm_mean": 36.7,
     "pm_median": 30.5,
     "raw": [
+      0,
       2,
       5,
       7,
