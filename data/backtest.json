@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-11T02:30:21.399540Z",
-  "total_trades": 151,
+  "generated_at": "2026-11-11T02:35:14.516719Z",
+  "total_trades": 152,
   "direction": {
+    "Unset": 6,
     "SHORT": 109,
-    "LONG": 37,
-    "Unset": 5
+    "LONG": 37
   },
   "rr_distribution": {
     "5.5R": 12,
@@ -34,7 +34,7 @@
     "2026-08": 2,
     "2026-09": 12,
     "2026-10": 6,
-    "2026-11": 2
+    "2026-11": 3
   },
   "session_split": {
     "AM": 93,
