@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-15T17:40:17.233226Z",
-  "total_trades": 119,
+  "generated_at": "2026-11-15T17:45:16.040295Z",
+  "total_trades": 118,
   "direction": {
-    "SHORT": 86,
+    "SHORT": 85,
     "LONG": 28,
     "Unset": 5
   },
@@ -12,7 +12,7 @@
     "7R": 9,
     "3.5R": 11,
     "4R": 23,
-    "6R": 11,
+    "6R": 10,
     "6.5R": 4,
     "3R": 7,
     "4.5R": 11,
@@ -28,7 +28,7 @@
     "2026-02": 12,
     "2026-03": 3,
     "2026-04": 11,
-    "2026-05": 11,
+    "2026-05": 10,
     "2026-06": 5,
     "2026-07": 12,
     "2026-08": 2,
@@ -37,20 +37,19 @@
     "2026-11": 3
   },
   "session_split": {
-    "AM": 83,
+    "AM": 82,
     "PM": 37
   },
   "entry_model_usage": {
-    "2022 Model": 82,
+    "2022 Model": 81,
     "SB": 38,
-    "OTE": 24,
+    "OTE": 23,
     "BREAKER": 18,
     "1st PFVG": 7,
     "IFVG in Breaker": 5
   },
   "entry_time_buckets_am": {
     "09:35": 1,
-    "09:55": 1,
     "10:00": 5,
     "10:05": 3,
     "10:10": 2,
@@ -97,13 +96,13 @@
     "15:45": 2
   },
   "duration": {
-    "count": 119,
-    "mean_minutes": 39.2,
-    "median_minutes": 30,
+    "count": 118,
+    "mean_minutes": 39.3,
+    "median_minutes": 30.5,
     "min_minutes": 5,
     "max_minutes": 140,
-    "am_mean": 39.5,
-    "am_median": 30,
+    "am_mean": 39.8,
+    "am_median": 30.5,
     "pm_mean": 38.3,
     "pm_median": 30.5,
     "raw": [
@@ -136,7 +135,6 @@
       15,
       15,
       15,
-      16,
       16,
       16,
       16,
