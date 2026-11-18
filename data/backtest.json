@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-18T03:40:15.977930Z",
+  "generated_at": "2026-11-18T03:45:17.733267Z",
   "total_trades": 119,
   "direction": {
-    "Unset": 6,
-    "SHORT": 85,
-    "LONG": 28
+    "SHORT": 86,
+    "LONG": 28,
+    "Unset": 5
   },
   "rr_distribution": {
     "5R": 22,
@@ -37,14 +37,14 @@
     "2026-11": 4
   },
   "session_split": {
-    "AM": 82,
+    "AM": 83,
     "PM": 37
   },
   "entry_model_usage": {
     "2022 Model": 81,
     "SB": 38,
     "OTE": 23,
-    "BREAKER": 18,
+    "BREAKER": 19,
     "1st PFVG": 7,
     "IFVG in Breaker": 5
   },
@@ -72,7 +72,8 @@
     "11:35": 1,
     "11:40": 1,
     "11:45": 1,
-    "14:15": 1
+    "14:15": 1,
+    "23:00": 1
   },
   "entry_time_buckets_pm": {
     "13:40": 1,
@@ -96,16 +97,17 @@
     "15:45": 2
   },
   "duration": {
-    "count": 118,
-    "mean_minutes": 39.3,
-    "median_minutes": 30.5,
-    "min_minutes": 5,
+    "count": 119,
+    "mean_minutes": 39.0,
+    "median_minutes": 30,
+    "min_minutes": 0,
     "max_minutes": 140,
-    "am_mean": 39.8,
-    "am_median": 30.5,
+    "am_mean": 39.3,
+    "am_median": 30,
     "pm_mean": 38.3,
     "pm_median": 30.5,
     "raw": [
+      0,
       5,
       7,
       9,
