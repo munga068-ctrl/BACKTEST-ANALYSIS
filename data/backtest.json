@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-20T10:45:16.108456Z",
-  "total_trades": 118,
+  "generated_at": "2026-11-20T10:50:16.956369Z",
+  "total_trades": 117,
   "direction": {
-    "SHORT": 85,
+    "SHORT": 84,
     "LONG": 28,
     "Unset": 5
   },
@@ -15,7 +15,7 @@
     "6R": 10,
     "6.5R": 4,
     "3R": 7,
-    "4.5R": 11,
+    "4.5R": 10,
     "8R+": 6,
     "10R +": 5
   },
@@ -25,7 +25,7 @@
     "2025-11": 12,
     "2025-12": 8,
     "2026-01": 10,
-    "2026-02": 12,
+    "2026-02": 11,
     "2026-03": 3,
     "2026-04": 11,
     "2026-05": 10,
@@ -41,8 +41,8 @@
     "PM": 37
   },
   "entry_model_usage": {
-    "2022 Model": 80,
-    "SB": 37,
+    "2022 Model": 79,
+    "SB": 36,
     "OTE": 23,
     "BREAKER": 19,
     "1st PFVG": 7,
@@ -96,13 +96,13 @@
     "15:45": 2
   },
   "duration": {
-    "count": 118,
-    "mean_minutes": 39.2,
-    "median_minutes": 30.5,
+    "count": 117,
+    "mean_minutes": 39.4,
+    "median_minutes": 31,
     "min_minutes": 5,
     "max_minutes": 140,
-    "am_mean": 39.6,
-    "am_median": 30,
+    "am_mean": 39.9,
+    "am_median": 31,
     "pm_mean": 38.3,
     "pm_median": 30.5,
     "raw": [
@@ -135,7 +135,6 @@
       15,
       15,
       15,
-      16,
       16,
       16,
       17,
