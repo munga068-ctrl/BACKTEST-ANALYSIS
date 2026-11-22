@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-22T09:00:21.860291Z",
+  "generated_at": "2026-11-22T09:05:13.838596Z",
   "total_trades": 118,
   "direction": {
     "SHORT": 85,
@@ -37,7 +37,7 @@
     "2026-11": 5
   },
   "session_split": {
-    "AM": 80,
+    "AM": 79,
     "PM": 37
   },
   "entry_model_usage": {
@@ -52,7 +52,7 @@
     "09:35": 1,
     "10:00": 3,
     "10:05": 4,
-    "10:10": 3,
+    "10:10": 2,
     "10:15": 5,
     "10:20": 7,
     "10:25": 2,
@@ -100,8 +100,8 @@
     "median_minutes": 30.5,
     "min_minutes": 5,
     "max_minutes": 140,
-    "am_mean": 39.7,
-    "am_median": 30.0,
+    "am_mean": 40.0,
+    "am_median": 30,
     "pm_mean": 38.4,
     "pm_median": 31,
     "raw": [
