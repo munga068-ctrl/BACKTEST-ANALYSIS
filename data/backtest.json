@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-11-22T04:30:19.765601Z",
+  "generated_at": "2026-11-22T04:35:13.581944Z",
   "total_trades": 118,
   "direction": {
-    "Unset": 6,
-    "SHORT": 84,
-    "LONG": 28
+    "SHORT": 85,
+    "LONG": 28,
+    "Unset": 5
   },
   "rr_distribution": {
-    "4R": 23,
+    "4R": 24,
     "5R": 22,
     "5.5R": 10,
     "7R": 9,
@@ -37,12 +37,12 @@
     "2026-11": 5
   },
   "session_split": {
-    "AM": 80,
+    "AM": 81,
     "PM": 37
   },
   "entry_model_usage": {
     "2022 Model": 79,
-    "SB": 36,
+    "SB": 37,
     "OTE": 23,
     "BREAKER": 19,
     "1st PFVG": 7,
@@ -71,7 +71,8 @@
     "11:30": 2,
     "11:35": 1,
     "11:40": 1,
-    "11:45": 1
+    "11:45": 1,
+    "19:00": 1
   },
   "entry_time_buckets_pm": {
     "13:40": 1,
